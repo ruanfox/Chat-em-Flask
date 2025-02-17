@@ -82,6 +82,7 @@ class AuthController:
         """
         Realiza o logout do usuário removendo a sessão.
         """
-        session.pop('user_id', None)  # Remove o ID do usuário da sessão
+        session.clear()  # Remove o ID do usuário da sessão
+        session.permanent = False
         
         return {"message": "Logout realizado"}, 200  # Retorna mensagem de sucesso e status 200 (OK)

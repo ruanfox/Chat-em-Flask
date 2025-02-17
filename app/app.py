@@ -12,7 +12,8 @@ def create_app():
     app.config.update(
         SESSION_COOKIE_SECURE=False,    # True em produção
         SESSION_COOKIE_HTTPONLY=True,
-        SESSION_COOKIE_SAMESITE='Lax'
+        SESSION_COOKIE_SAMESITE='Lax',
+        SESSION_REFRESH_EACH_REQUEST=True
     )
     
     # Inicializa o banco de dados
