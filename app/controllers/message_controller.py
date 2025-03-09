@@ -2,19 +2,19 @@ from flask import request, session
 from datetime import datetime
 from models.message import Message
 from database import db
-from controllers.auth_controller import AuthController
 
 class MessageController:
     @staticmethod
     def send_message():
-        user = AuthController.get_current_user()
-        if not user:
+        user_id = session.get('user_id')
+        nickname = session.get('nickname')
+        if not user_id:
             return {"error": "Não autorizado"}, 401
 
         data = request.form
         new_message = Message(
             conteudo=data['conteudo'],
-            usuario_id=user.id,  # Usa o ID do usuário logado
+            usuario_id=user_id,  # Usa o ID do usuário logado
             sala_id=data['sala_id'],
             data_envio=datetime.utcnow()
         )
@@ -27,7 +27,7 @@ class MessageController:
                 "data": {
                     "conteudo": new_message.conteudo,
                     "sala_id": new_message.sala_id,
-                    "autor": user.nickname
+                    "autor": nickname
                 }
             }, 201
         except Exception as e:

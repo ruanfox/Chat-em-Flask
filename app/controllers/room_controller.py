@@ -1,4 +1,4 @@
-from flask import request, session
+from flask import request, session, redirect
 from models.room import Room
 from models.message import Message
 from database import db
@@ -7,69 +7,42 @@ from controllers.auth_controller import AuthController
 class RoomController:
     @staticmethod
     def create_room():
-        user = AuthController.get_current_user()
-        if not user:
+        user_id = session.get('user_id')
+        if not user_id:
             return {"error": "Não autorizado"}, 401
 
         data = request.form
         new_room = Room(
             nome=data['nome'],
-            criado_por=user.id  # Usa o ID do usuário logado
+            criado_por=user_id  # Usa o ID do usuário logado
         )
+        db.session.add(new_room)
+        db.session.commit()
+        db.session.rollback()
         
-        try:
-            db.session.add(new_room)
-            db.session.commit()
-            return {
-                "message": "Sala criada",
-                "room_id": new_room.id,
-                "nome": new_room.nome
-            }, 201
-        except Exception as e:
-            db.session.rollback()
-            return {"error": str(e)}, 500
+        return redirect("/chat")
+        
 
     @staticmethod
     def delete_room(room_id):
-        user = AuthController.get_current_user()
-        if not user:
+        user_id = session.get('user_id')  # Obtém o ID do usuário logado
+        if not user_id:
             return {"error": "Não autorizado"}, 401
 
-        room = Room.query.get_or_404(room_id)
-        
-        if room.criado_por != user.id:
-            return {"error": "Acesso negado"}, 403
-            
-        try:
-            Message.query.filter_by(sala_id=room_id).delete()
-            db.session.delete(room)
-            db.session.commit()
-            return {"message": "Sala excluída"}, 200
-        except Exception as e:
-            db.session.rollback()
-            return {"error": str(e)}, 500
-
-    @staticmethod
-    def delete_room(room_id):
-        current_user = AuthController.get_current_user()
-        
-        if not current_user:
-            return {"erro": "Não autorizado"}, 401
-        
         room = Room.query.get(room_id)
-        
         if not room:
-            return {"error": "Sala Não encontrada"}, 404
-        
-        if room.criado_por != current_user.id:  # Garantir que ambos são int
+            return {"error": "Sala não encontrada"}, 404
+
+        # Verifica se o usuário logado é o criador da sala
+        if room.criado_por != user_id:
             return {"error": "Acesso negado: Você não é o dono desta sala"}, 403
-        
+
         try:
-            # Deleta mensagens associadas primeiro
+            # Deleta mensagens associadas antes de remover a sala
             Message.query.filter_by(sala_id=room_id).delete()
             db.session.delete(room)
             db.session.commit()
-            return {"message": "Sala excluída"}, 200
+            return {"message": "Sala excluída com sucesso"}, 200
         except Exception as e:
             db.session.rollback()
             return {"error": str(e)}, 500
