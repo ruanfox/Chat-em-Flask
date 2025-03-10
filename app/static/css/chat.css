@@ -101,7 +101,6 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 10px;
-    max-width: 100%;
   }
   
   /* Nome do usuário */
@@ -111,11 +110,15 @@
     color: #2f3542;
   }
   
+  /* Data de envio da mensagem*/
   .data_envio{
     font-weight: bold;
+    margin-left: auto;
   }
+
   /* Estilização do texto da mensagem */
   .message-text {
+    width: 100vh;
     color: #333;
     word-wrap: break-word;
   }
@@ -233,3 +236,19 @@
   margin-bottom: 1rem;
 }
 
+/*------------------------Responsividade-------------------------*/
+
+@media screen and (min-width: 412px) {
+  .chat-container{
+
+  }
+
+  .chat-sidebar{
+    background-color: #ff4757;
+    width: 100;
+  }
+
+  .chat-main{
+    width: 0px;
+  }
+}
