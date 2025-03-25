@@ -1,4 +1,11 @@
-let selectedRoomId = null; // Variável global para armazenar o ID da sala
+const socket = io(); // Conecta ao servidor
+
+// Variável global para armazenar o ID da sala
+let selectedRoomId = null; 
+
+// Variável global para armazenar o nickname do usuário
+let globalUserId = null;
+let globalNickname = null;
 
 document.addEventListener("DOMContentLoaded", async function () {
     const roomList = document.getElementById("room-list");
@@ -26,8 +33,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     document.querySelectorAll(".room-list-container").forEach(el => el.classList.remove("active"));
                     roomItem.classList.add("active");
 
-                    console.log("Sala selecionada:", selectedRoomId);
-
                     // Carregar mensagens da sala selecionada
                     loadMessages(selectedRoomId);
                 });
@@ -40,10 +45,109 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 });
 
-// Função para carregar mensagens da sala selecionada
+
+// Entra na sala ao selecionar uma sala
+document.addEventListener("DOMContentLoaded", function () {
+    const roomList = document.getElementById("room-list");
+
+    roomList.addEventListener("click", function (event) {
+        const roomItem = event.target.closest(".room-list-container");
+        if (roomItem) {
+            const roomId = roomItem.getAttribute("data-room-id");
+            selectedRoomId = roomId;  // Atualiza a sala selecionada
+            sessionStorage.setItem("selectedRoomId", roomId);  // Salva no sessionStorage
+            socket.emit('join_room', { room_id: roomId });  // Entra na sala
+            loadMessages(roomId);  // Carrega as mensagens da sala
+        }
+    });
+});
+
+// função para capturar o id e o nickname
+async function fetchUserSession() {
+    try {
+        const response = await fetch('/api/user_session', {
+            method: 'GET',
+            credentials: 'same-origin'// Garante o envio dos cookies da sessão
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            globalUserId = data.user_id;
+            globalNickname = data.nickname;
+            // Também podemos salvar no sessionStorage se desejado:
+            sessionStorage.setItem('user_id', globalUserId);
+            sessionStorage.setItem('nickname', globalNickname);
+        } else {
+            console.error("Erro ao buscar sessão:", response.statusText);
+        }
+    } catch (error) {
+        console.error("Erro na requisição da sessão:", error);
+    }
+}
+
+// Chama a função ao carregar o chat
+document.addEventListener("DOMContentLoaded", function () {
+    fetchUserSession();
+});
+
+// Função para enviar mensagem
+document.getElementById("message-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    const messageInput = document.getElementById("message-input");
+    const messageContent = messageInput.value.trim();
+    const roomId = selectedRoomId || sessionStorage.getItem("selectedRoomId");
+
+    // Usa as variáveis globais obtidas pela rota de sessão
+    if (!globalUserId || !globalNickname) {
+        alert("Você precisa estar logado para enviar mensagens.");
+        return;
+    }
+
+    if (!messageContent) {
+        alert("Digite uma mensagem antes de enviar.");
+        return;
+    }
+
+    if (!roomId) {
+        alert("Selecione uma sala antes de enviar mensagens!");
+        return;
+    }
+
+    // Envia a mensagem via WebSocket
+    socket.emit("send_message", {
+        room_id: roomId,
+        message: messageContent,
+        author: globalNickname,
+        user_id: globalUserId
+    });
+
+    // Limpa o campo de entrada
+    messageInput.value = '';
+});
+
+
+// Recebe uma mensagem em tempo real
+socket.on('receive_message', function (data) {
+    const currentRoomId = selectedRoomId || sessionStorage.getItem("selectedRoomId");
+    if (data.room_id.toString() !== currentRoomId.toString()) return;  // Filtra mensagens de outras salas
+
+    // Adiciona a mensagem ao DOM
+    const messageContainer = document.querySelector(".list-message");
+    const newMessage = document.createElement("li");
+    newMessage.classList.add("message");
+    newMessage.innerHTML = `
+        <p class="nickname">@${data.author}</p>
+        <p class="message-text">${data.message}</p>
+        <p class="data_envio">${new Date(data.timestamp).toLocaleTimeString()}</p>
+    `;
+    messageContainer.prepend(newMessage);
+});
+
+// Carrega as mensagens da sala
 async function loadMessages(roomId) {
     const messageContainer = document.querySelector(".list-message");
-    messageContainer.innerHTML = ""; // Limpa mensagens atuais
+    messageContainer.innerHTML = "";  // Limpa as mensagens atuais
 
     try {
         const response = await fetch(`/api/messages/${roomId}`);
@@ -65,64 +169,6 @@ async function loadMessages(roomId) {
         console.error("Erro ao carregar mensagens:", error);
     }
 }
-
-// Função para enviar mensagem
-document.addEventListener("DOMContentLoaded", function () {
-    const messageForm = document.getElementById("message-form");
-
-    messageForm.addEventListener("submit", async function (event) {
-        event.preventDefault(); // Evita o reload da página
-
-        const messageInput = document.getElementById("message-input");
-        const messageContent = messageInput.value.trim();
-        const roomId = selectedRoomId || sessionStorage.getItem("selectedRoomId");
-
-        if (!messageContent) {
-            alert("Digite uma mensagem antes de enviar.");
-            return;
-        }
-
-        if (!roomId) {
-            alert("Selecione uma sala antes de enviar mensagens!");
-            return;
-        }
-
-        try {
-            const response = await fetch("/api/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                    conteudo: messageContent,
-                    sala_id: roomId,
-                }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                // Exibir a mensagem na tela sem recarregar
-                const messageContainer = document.querySelector(".list-message");
-                const newMessage = document.createElement("li");
-                newMessage.classList.add("message");
-                newMessage.innerHTML = `
-                    <p class="nickname">@Você</p>
-                    <p class="message-text">${messageContent}</p>
-                    <p class="data_envio">${new Date().toLocaleTimeString()}</p>
-                `;
-                messageContainer.prepend(newMessage);
-
-                messageInput.value = ""; // Limpa o campo de entrada
-            } else {
-                alert(result.error || "Erro ao enviar a mensagem.");
-            }
-        } catch (error) {
-            console.error("Erro ao enviar mensagem:", error);
-            alert("Erro na requisição.");
-        }
-    });
-});
 
 // Função para deletar uma sala
 async function deleteRoom(roomId) {

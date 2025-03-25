@@ -30,7 +30,8 @@ class AuthController:
             try:
                 db.session.add(new_user)
                 db.session.commit()
-                return {"message": "Usuário criado com sucesso"}, 201
+                return redirect('/')
+                    #{"message": "Usuário criado com sucesso"}, 201
             except Exception as e:
                 db.session.rollback()
                 return {"error": str(e)}, 500
@@ -61,6 +62,7 @@ class AuthController:
 
         print("Minha session após meu login:", session)
         AuthController.auth_required(True)
+
         return redirect("/chat")
 
     @staticmethod
@@ -79,3 +81,20 @@ class AuthController:
         if auth is not None:
             AuthController.is_authenticated = auth  # Atualiza o estado
         return AuthController.is_authenticated
+    
+    @staticmethod
+    def get_user_session(): 
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({"error": "Usuário não autenticado"}), 401
+        
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuário não encontrado"}), 404
+        
+        return jsonify({
+            "user_id": user.id,
+            "nickname": user.nickname
+        })
+        
+        

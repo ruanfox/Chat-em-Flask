@@ -238,14 +238,14 @@
 
 /*------------------------Responsividade-------------------------*/
 
-@media screen and (min-width: 412px) {
+@media screen and (max-width: 412px) {
   .chat-container{
 
   }
 
   .chat-sidebar{
     background-color: #ff4757;
-    width: 100;
+    width: 100%;
   }
 
   .chat-main{
