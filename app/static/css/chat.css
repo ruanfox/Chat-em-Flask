@@ -1,0 +1,254 @@
+/* Reset global */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Garantir que html e body ocupem 100% da tela */
+  html, body {
+    height: 100%;
+    width: 100%;
+  }
+  
+  /* Estilos base */
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    color: #333;
+  }
+  
+  /* Container principal do chat que ocupa toda a tela */
+  .chat-container {
+    display: flex;
+    height: 100vh; /* 100% da altura da viewport */
+    width: 100vw;  /* 100% da largura da viewport */
+  }
+  
+  /* Sidebar (Salas) */
+  .chat-sidebar {
+    width: 300px;
+    background: #1e90ff;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .sidebar-header h2 {
+    font-size: 24px;
+  }
+  
+  /* Lista de salas */
+  .room-list {
+    list-style: none;
+    overflow-y: auto;
+    flex-grow: 1;
+  }
+  
+  .room-list li {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .room-list li:hover,
+  .room-list li.active {
+    background: #57606f;
+  }
+  
+  /* Área principal do chat */
+  .chat-main {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Ocupa toda a tela */
+    background: #f1f2f6;
+  }
+  
+  /* Container das mensagens */
+  .message-container {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Mensagens começam de baixo para cima */
+    padding: 10px;
+  }
+  
+  /* Lista de mensagens */
+  .list-message {
+    display: flex;
+    flex-direction: column-reverse;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Cada mensagem individual */
+  .message {
+    display: flex;
+    align-items: flex-start;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+  }
+  
+  /* Nome do usuário */
+  .nickname {
+    font-weight: bold;
+    margin-right: 10px;
+    color: #2f3542;
+  }
+  
+  /* Data de envio da mensagem*/
+  .data_envio{
+    font-weight: bold;
+    margin-left: auto;
+  }
+
+  /* Estilização do texto da mensagem */
+  .message-text {
+    width: 100vh;
+    color: #333;
+    word-wrap: break-word;
+  }
+  
+  /* Área de mensagens */
+  .message-container {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  
+  /* Formulário de envio de mensagens */
+  .message-form {
+
+    display: flex;
+    border-top: 1px solid #dcdde1;
+    padding: 10px 20px;
+    background: #f1f2f6;
+  }
+
+  .message-form input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #dcdde1;
+    border-radius: 4px;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+  
+  /* Botão primário */
+  .btn-primary {
+    background: #1e90ff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    background: #3742fa;
+  }
+  
+  /* Botão de ação (danger) */
+  .btn-danger {
+    all: unset;
+  }
+
+  .icons-container{
+    width: 20%;
+    display: flex;
+    justify-content: space-between;
+    
+  }
+
+  /* Salas*/
+  .room-list{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0;
+  }
+
+  .room-list-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    margin-top: 0.5rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3); /* sombra inicial */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .room-list-container:hover {
+    transform: translateY(-5px); /* levanta a div */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* sombra mais intensa ao passar o mouse */
+  }
+  
+  .room-list-container p {
+    margin: 0;
+    font-size: 1rem;
+  }
+  
+  .room-list-container i {
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #ff4757;
+    transition: color 0.3s;
+  }
+
+/* Criar uma nova sala*/
+
+.new-room-card {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  width: 300px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  padding: 1rem;
+  display: none; /* Inicialmente escondido */
+}
+.new-room-card .card-title {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.new-room-card .form-control {
+  margin-bottom: 1rem;
+}
+
+/*------------------------Responsividade-------------------------*/
+
+@media screen and (max-width: 412px) {
+  .chat-container{
+
+  }
+
+  .chat-sidebar{
+    background-color: #ff4757;
+    width: 100%;
+  }
+
+  .chat-main{
+    width: 0px;
+  }
+}

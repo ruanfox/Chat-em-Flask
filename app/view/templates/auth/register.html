@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex vh-100 row justify-content-center align-items-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Criar Conta</h2>
+                
+                <form action="/api/register" method="POST" id="register-form">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">E-mail</label>
+                        <input type="email" name="email" class="form-control" id="email" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="nickname" class="form-label">Nick name</label>
+                        <input type="text" name="nickname" class="form-control" id="nickname" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" name="password" class="form-control" id="password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Criar conta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

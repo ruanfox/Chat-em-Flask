@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Chat{% endblock %}
+
+{% block content %}
+
+<div class="chat-container">
+  <!-- Sidebar com salas -->
+  <aside class="chat-sidebar">
+    <div class="sidebar-header">
+      <h2>Salas</h2>
+      <div class="icons-container">
+        <button id="new-room-btn" class="btn-danger">
+          <i class="bi bi-plus-circle"></i>
+        </button>
+        <button id="leave-room-btn" class="btn-danger">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+    <ul id="room-list" class="room-list">
+      <!--
+      <div class="room-list-container">
+        <p>cadu é gay</p>
+        <i class="bi bi-trash"></i>
+      </div>
+      -->
+    </ul>
+  </aside>
+
+  <!-- Área principal do chat -->
+  <main class="chat-main"> 
+    <div id="message-container" class="message-container">
+      <ul class="list-message">
+        
+      </ul>
+    </div>
+    <form action="/api/messages" method="POST" id="message-form" class="message-form">
+      <input type="text" id="message-input" name="conteudo" placeholder="Digite sua mensagem..." autocomplete="off">
+      <button type="submit" class="btn-primary">
+        <i class="bi bi-send"></i>
+      </button>
+    </form>
+  </main>
+</div>
+  
+<!-- Card para criar nova sala -->
+<div id="new-room-card" class="new-room-card">
+  <form action="/api/rooms" method="POST" id="new-room-form" class="new-room-form">
+    <h5 class="card-title">Nova Sala</h5>
+    <input type="text" id="nome" name="nome" class="form-control" placeholder="Nome da sala" required>
+    <div class="d-flex justify-content-between">
+      <button id="create-room-submit" type="submit" class="btn btn-primary">Criar Sala</button>
+      <button id="cancel-room" type="button" class="btn btn-secondary">Cancelar</button>
+    </div>
+  </form>
+</div>
+
+{% endblock %}
